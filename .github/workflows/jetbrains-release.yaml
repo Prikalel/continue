@@ -99,14 +99,6 @@ jobs:
         with:
           ref: ${{ github.event.release.tag_name }}
 
-      - name: Import Apple certificate
-        uses: apple-actions/import-codesign-certs@v5
-        with:
-          keychain: ${{ github.run_id }}
-          keychain-password: ${{ github.run_id }}
-          p12-file-base64: ${{ secrets.APPLE_CERT_DATA }}
-          p12-password: ${{ secrets.APPLE_CERT_PASSWORD }}
-
       # Validate wrapper
       - name: Gradle Wrapper Validation
         uses: gradle/actions/wrapper-validation@v3
@@ -203,7 +195,7 @@ jobs:
           npm run prepackage
         env:
           # https://github.com/microsoft/vscode-ripgrep/issues/9#issuecomment-643965333
-          GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # npm install binary
       - name: Install binary node_modules
@@ -216,25 +208,6 @@ jobs:
         run: |
           cd ../../binary
           npm run build
-
-      # - name: Code sign darwin binaries
-      #   run: |
-      #     echo "Signing executable with keychain: ${{ github.run_id }}"
-      #     codesign --sign - ../../binary/bin/darwin-x64/continue-binary
-      #     codesign --sign - ../../binary/bin/darwin-arm64/continue-binary
-
-      # - name: Sign darwin-arm64 binary
-      #   uses: lando/code-sign-action@v2
-      #   with:
-      #     file: ./binary/bin/darwin-arm64/continue-binary
-      #     certificate-data: ${{ secrets.APPLE_CERT_DATA }}
-      #     certificate-password: ${{ secrets.APPLE_CERT_PASSWORD }}
-      #     apple-notary-user: ${{ secrets.APPLE_NOTARY_USER }}
-      #     apple-notary-password: ${{ secrets.APPLE_NOTARY_PASSWORD }}
-      #     apple-notary-tool: altool
-      #     apple-team-id: 43XFLY66ZD
-      #     apple-product-id: dev.continue.continue-binary
-      #     options: --options runtime --entitlements entitlements.xml
 
       # Build plugin
       - name: Build plugin
