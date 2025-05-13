@@ -240,27 +240,6 @@ jobs:
       - name: Build plugin
         run: ./gradlew buildPlugin
 
-      # Publish the plugin to JetBrains Marketplace
-      - name: Publish EAP Plugin
-        if: github.event_name == 'release' || github.event.inputs.publish_build == 'true'
-        env:
-          PUBLISH_TOKEN: ${{ secrets.JETBRAINS_PUBLISH_TOKEN }}
-          CERTIFICATE_CHAIN: ${{ secrets.JETBRAINS_CERTIFICATE_CHAIN }}
-          PRIVATE_KEY: ${{ secrets.JETBRAINS_PRIVATE_KEY }}
-          PRIVATE_KEY_PASSWORD: ${{ secrets.JETBRAINS_PRIVATE_KEY_PASSWORD }}
-          RELEASE_CHANNEL: eap
-        run: ./gradlew publishPlugin
-
-      - name: Publish Stable Plugin
-        if: github.event_name == 'release' || github.event.inputs.publish_build == 'true'
-        env:
-          PUBLISH_TOKEN: ${{ secrets.JETBRAINS_PUBLISH_TOKEN }}
-          CERTIFICATE_CHAIN: ${{ secrets.JETBRAINS_CERTIFICATE_CHAIN }}
-          PRIVATE_KEY: ${{ secrets.JETBRAINS_PRIVATE_KEY }}
-          PRIVATE_KEY_PASSWORD: ${{ secrets.JETBRAINS_PRIVATE_KEY_PASSWORD }}
-          RELEASE_CHANNEL: default
-        run: ./gradlew publishPlugin
-
       # Prepare plugin archive content for creating artifact
       - name: Prepare Plugin Artifact
         id: artifact
@@ -283,42 +262,11 @@ jobs:
           name: ${{ steps.artifact.outputs.filename }}
           path: ./extensions/intellij/build/distributions/content/*/*
 
-      # Upload binaries as artifacts
-      - name: Upload artifact (darwin-arm64)
-        uses: actions/upload-artifact@v4
-        with:
-          name: continue-binary-darwin-arm64
-          path: ./binary/bin/darwin-arm64/
-
-      - name: Upload artifact (darwin-x64)
-        uses: actions/upload-artifact@v4
-        with:
-          name: continue-binary-darwin-x64
-          path: ./binary/bin/darwin-x64/
-
       - name: Upload artifact (win32-x64)
         uses: actions/upload-artifact@v4
         with:
           name: continue-binary-win32-x64
           path: ./binary/bin/win32-x64/
-
-      - name: Upload artifact (win32-arm64)
-        uses: actions/upload-artifact@v4
-        with:
-          name: continue-binary-win32-arm64
-          path: ./binary/bin/win32-arm64/
-
-      - name: Upload artifact (linux-arm64)
-        uses: actions/upload-artifact@v4
-        with:
-          name: continue-binary-linux-arm64
-          path: ./binary/bin/linux-arm64/
-
-      - name: Upload artifact (linux-x64)
-        uses: actions/upload-artifact@v4
-        with:
-          name: continue-binary-linux-x64
-          path: ./binary/bin/linux-x64/
 
   test-binaries:
     needs: build
